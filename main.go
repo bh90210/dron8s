@@ -4,7 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"net/http"
+	"io/ioutil"
+	"log"
 	"os"
 	"strings"
 
@@ -15,7 +16,9 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/serializer/yaml"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/discovery"
-	memory "k8s.io/client-go/discovery/cached"
+
+	// memory "k8s.io/client-go/discovery/cached"
+	"k8s.io/client-go/discovery/cached/memory"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
@@ -24,22 +27,22 @@ import (
 
 // GOOS=linux GOARCH=amd64 CGO_ENABLED=0 ARG=v0.0.9 go generate main.go
 //go:generate go build -o dron8s
-//go:generate docker build  -t bh90210/dron8s:latest -t bh90210/dron8s:$ARG .
+//go:generate docker build -t bh90210/dron8s:latest -t bh90210/dron8s:$ARG .
 //go:generate docker push bh90210/dron8s:$ARG
 //go:generate docker push bh90210/dron8s:latest
 
 func main() {
-	body := strings.NewReader(
-		os.Getenv("PLUGIN_BODY"),
-	)
+	// body := strings.NewReader(
+	// 	os.Getenv("PLUGIN_BODY"),
+	// )
 
-	req, err := http.NewRequest(
-		os.Getenv("PLUGIN_METHOD"),
-		os.Getenv("PLUGIN_URL"),
-		body,
-	)
+	// req, err := http.NewRequest(
+	// 	os.Getenv("PLUGIN_METHOD"),
+	// 	os.Getenv("PLUGIN_URL"),
+	// 	body,
+	// )
 
-	fmt.Println(req)
+	// fmt.Println(req)
 
 	fmt.Println("k8s starting")
 	// creates the in-cluster config
@@ -83,7 +86,8 @@ func main() {
 	//
 	//
 
-	doSSA(context.Background(), config)
+	er := doSSA(context.Background(), config)
+	log.Println(er)
 }
 
 const deploymentYAML = `
@@ -103,26 +107,7 @@ spec:
     spec:
       containers:
       - name: nginx
-		image: nginx:latest
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: nginx-deployment2
-  namespace: default
-spec:
-  selector:
-    matchLabels:
-      app: nginx
-  template:
-    metadata:
-      labels:
-        app: nginx
-    spec:
-      containers:
-      - name: nginx
-        image: nginx:latest
-`
+        image: nginx:latest`
 
 var decUnstructured = yaml.NewDecodingSerializer(unstructured.UnstructuredJSONScheme)
 
@@ -141,41 +126,75 @@ func doSSA(ctx context.Context, cfg *rest.Config) error {
 		return err
 	}
 
-	// 3. Decode YAML manifest into unstructured.Unstructured
-	obj := &unstructured.Unstructured{}
-	_, gvk, err := decUnstructured.Decode([]byte(deploymentYAML), nil, obj)
+	// 	// 2.1.
+	// 	yamlfile, err := os.Open(os.Getenv("PLUGIN_YAML"))
+	// 	defer yamlfile.Close()
+
+	// 	// Splits on newlines by default.
+	// 	scanner := bufio.NewScanner(yamlfile)
+
+	// 	line := 1
+	// 	// https://golang.org/pkg/bufio/#Scanner.Scan
+	// 	for scanner.Scan() {
+	// 		if strings.Contains(scanner.Text(), `
+	// ---
+	// `) {
+	// 			fmt.Println(line)
+	// 		}
+
+	// 		line++
+	// 	}
+
+	// 	if err := scanner.Err(); err != nil {
+	// 		fmt.Println(err)
+	// 	}
+
+	yamlfile2, err := ioutil.ReadFile(os.Getenv("PLUGIN_YAML"))
 	if err != nil {
-		return err
+		log.Fatal(err)
 	}
+	text := string(yamlfile2)
 
-	// 4. Find GVR
-	mapping, err := mapper.RESTMapping(gvk.GroupKind(), gvk.Version)
-	if err != nil {
-		return err
+	resources := strings.Split(text, "---")
+
+	for _, v := range resources {
+		// 3. Decode YAML manifest into unstructured.Unstructured
+		obj := &unstructured.Unstructured{}
+		_, gvk, err := decUnstructured.Decode([]byte(v), nil, obj)
+		if err != nil {
+			return err
+		}
+
+		// 4. Find GVR
+		mapping, err := mapper.RESTMapping(gvk.GroupKind(), gvk.Version)
+		if err != nil {
+			return err
+		}
+
+		// 5. Obtain REST interface for the GVR
+		var dr dynamic.ResourceInterface
+		if mapping.Scope.Name() == meta.RESTScopeNameNamespace {
+			// namespaced resources should specify the namespace
+			dr = dyn.Resource(mapping.Resource).Namespace(obj.GetNamespace())
+		} else {
+			// for cluster-wide resources
+			dr = dyn.Resource(mapping.Resource)
+		}
+
+		// 6. Marshal object into JSON
+		data, err := json.Marshal(obj)
+		if err != nil {
+			return err
+		}
+
+		// 7. Create or Update the object with SSA
+		//     types.ApplyPatchType indicates SSA.
+		//     FieldManager specifies the field owner ID.
+		_, err = dr.Patch(ctx, obj.GetName(), types.ApplyPatchType, data, metav1.PatchOptions{
+			FieldManager: "dron8s-plugin",
+		})
 	}
-
-	// 5. Obtain REST interface for the GVR
-	var dr dynamic.ResourceInterface
-	if mapping.Scope.Name() == meta.RESTScopeNameNamespace {
-		// namespaced resources should specify the namespace
-		dr = dyn.Resource(mapping.Resource).Namespace(obj.GetNamespace())
-	} else {
-		// for cluster-wide resources
-		dr = dyn.Resource(mapping.Resource)
-	}
-
-	// 6. Marshal object into JSON
-	data, err := json.Marshal(obj)
-	if err != nil {
-		return err
-	}
-
-	// 7. Create or Update the object with SSA
-	//     types.ApplyPatchType indicates SSA.
-	//     FieldManager specifies the field owner ID.
-	_, err = dr.Patch(ctx, obj.GetName(), types.ApplyPatchType, data, metav1.PatchOptions{
-		FieldManager: "sample-controller",
-	})
 
 	return err
+
 }
