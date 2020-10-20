@@ -1,14 +1,15 @@
 # Dron8s
 
-Yet another Kubernetes plugin for Drone using dynamic [Server Side Apply](https://kubernetes.io/docs/reference/using-api/api-concepts/#server-side-apply) to achieve `kubectl apply -f` parity.
+Yet another Kubernetes plugin for Drone using [dynamic](https://pkg.go.dev/k8s.io/client-go@v0.19.2/dynamic) [Server Side Apply](https://kubernetes.io/docs/reference/using-api/api-concepts/#server-side-apply) to achieve `kubectl apply -f` parity for your CI-CD pipelines.
 
 ## Features
-* Creates a resources if it does not exist/updates if it does
+* Create resources if they do not exist/update if they do
 * Can handle multiple yaml configs in one file
 * Can handle most resource types<sup>1</sup>
-* In-cluster/Out-of-cluster usage
+* In-cluster/Out-of-cluster use
+* Easy set up, simple usage
 
-_<sup>1</sup> This plugin use client-go@v0.19.2, while common Kubernetes API will work, some features will not. For more information check the [compatibility matrix](https://github.com/kubernetes/client-go#compatibility-matrix)._
+_<sup>1</sup>Using client-go@v0.19.2. While common Kubernetes API will work with your cluster, some features will not. For more information check the [compatibility matrix](https://github.com/kubernetes/client-go#compatibility-matrix)._
 
 # [in-cluster](https://github.com/kubernetes/client-go/tree/master/examples/in-cluster-client-configuration) use
 
@@ -17,7 +18,7 @@ In-cluster use is intented to only work along [Kubernetes Runner](https://docs.d
 ## Prerequisites 
 You need to manually create a `clusterrolebinding` to allow cluster resource manipulation from Drone server.
 
-Assuming you installed Drone/Kubernetes Runner using Drone provided Helm charts run:
+Assuming you installed Drone/Kubernetes Runner using [Drone provided Helm charts](https://github.com/drone/charts/tree/master/charts) run:
 ```bash
 $ kubectl create clusterrolebinding dron8s --clusterrole=cluster-admin --serviceaccount=drone:default
 ```
@@ -66,9 +67,17 @@ steps:
             secret
 ```
 
+# In-cluster Uninstall
+
+The only thing you need to manually delete is the `clusterrolebinding`. Run:
+
+```bash
+$ kubectl delete clusterrolebinding dron8s
+```
+
 # Developing
 
-If you wish you can directly change `.drone.yaml` as everything you need for the build is right there.
+If you wish you can directly edit `.drone.yaml` as everything you need for the build is right there.
 
 Otherwise:
 
@@ -81,7 +90,7 @@ $ docker build -t {username}/dron8s .
 
 $ docker push {username}/dron8s
 ```
-And to use your own repo inside Drone just change the `image` field to your `username/dron8s`
+And to use your own repo inside Drone just change the `image` field to your `{username}/dron8s`
 ```yaml
 kind: pipeline
 type: docker
@@ -93,7 +102,7 @@ steps:
   settings:
     yaml: ./config
 ```
-_Replace `{username}` with your actually docker (or other registry) username._
+_Replace `{username}` with your actual Docker Hub (or other registry) username._
 
 _For more information see Drone's [Plugin Documentation](https://docs.drone.io/plugins/tutorials/golang/)._
 
