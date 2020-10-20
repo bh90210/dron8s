@@ -7,7 +7,7 @@ Yet another Kubernetes plugin for Drone using [dynamic](https://pkg.go.dev/k8s.i
 * Can handle multiple yaml configs in one file
 * Can handle most resource types<sup>1</sup>
 * In-cluster/Out-of-cluster use
-* Easy set up, simple usage
+* Easy set up, simple usage, well documented
 
 _<sup>1</sup>Dron8s uses [client-go@v0.19.2](https://github.com/kubernetes/client-go/tree/v0.19.2). While most common Kubernetes API will work with your cluster's version, some features will not. For more information check the [compatibility matrix](https://github.com/kubernetes/client-go#compatibility-matrix)._
 
@@ -55,9 +55,9 @@ Create a secret with the contents of kubeconfig.
 
 _NOTE: You can always use Vault or AWS Secrets etc. But for this example I only show [Per Repository](https://docs.drone.io/secret/repository/), [Kubernetes Secrets](https://docs.drone.io/secret/external/kubernetes/) & [Encrypted](https://docs.drone.io/secret/encrypted/)._
 
-**1. Per Repository Secrets (GUI)**
+## **1. Per Repository Secrets (GUI)**
 
-Copy the contents of your `~/.kube/config` in Drone's Secret Value field:
+Copy the contents of your `~/.kube/config` in Drone's Secret Value field and name the secret `kubeconfig`:
 
 ![Imgur](https://imgur.com/Cx9h3Xx.jpg)
 
@@ -82,16 +82,16 @@ Delete the `secret` containing kubeconfig.
 
 ![Imgur](https://imgur.com/nyxIlxY.jpg)
 
-**2. Kubenrnetes Secrets (Kubectl)**
+## **2. Kubenrnetes Secrets (Kubectl)**
 
 _In order to use this type of secret you have to install `Kubernetes Secrets` [Helm Chart](https://github.com/drone/charts/tree/master/charts/drone-kubernetes-secrets).
 Furthermore the assumption is that you use `Kubernetes Runner` with out-of-cluster scope. 
 That is a scenario where your CI/CD exists in cluster **a** and you apply configurations in cluster **b**. For in-cluster usage you do not need `Kubernetes Secrets` or secrets at all. See <a href="#in-cluster-use">in-cluster use</a>._
 
-Before using Kubenrnetes Secrets in your pipeline you first need to manually create your secrets via `kubectl`
+Before using Kubenrnetes Secrets in your pipeline you first need to manually create your secrets via `kubectl`. In out case we need to create a secret out of `~/.kube/config`. Run:
 
 ```bash
-$
+$ kubectl create secret generic dron8s --from-file=kubeconfig=~/.kube/config
 ```
 
 ### Kubernetes Secrets - Kubernetes Runner Pipe Example
@@ -112,7 +112,7 @@ steps:
 kind: secret
 name: kubeconfig
 get:
-  path: kubernetes
+  path: dron8s
   name: kubeconfig
 ```
 
@@ -124,7 +124,7 @@ Delete the `secret` containing kubeconfig. Run:
 $ kubectl delete secret dron8s-kubeconfig
 ```
 
-**3. Encrypted (Drone)**
+## **3. Encrypted (Drone)**
 
 In order to use this method you need to have Drone CLI [installed](https://docs.drone.io/cli/install/) and [configured](https://docs.drone.io/cli/configure/) on your machine.
 
@@ -134,7 +134,7 @@ $ drone encrypt user/repositry $(printf “%s” “$(<~/.kube/config)”)
 ```
 where `user` is your real username and `repository` the name of the repository that you are creating the secret for.
 
-Copy the output out your terminal to `data` field inside kubeconfig secret.
+Copy the output of your terminal to `data` field inside kubeconfig secret.
 
 ### Encrypted Secret - Exec Runner Pipe Example
 
