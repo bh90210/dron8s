@@ -55,7 +55,7 @@ Create a secret with the contents of kubeconfig.
 
 _NOTE: You can always use Vault or AWS Secrets etc. But for this example I only show [Per Repository](https://docs.drone.io/secret/repository/), [Kubernetes Secrets](https://docs.drone.io/secret/external/kubernetes/) & [Encrypted](https://docs.drone.io/secret/encrypted/)._
 
-**1. Per Repository (GUI)**
+**1. Per Repository - Docker Runner (GUI)**
 
 Copy the contents of your `~/.kube/config` in Drone's Secret Value field:
 
@@ -80,17 +80,23 @@ steps:
 
 **2. Kubenrnetes Secrets (Kubectl)**
 
-Before using this type of secret you first need to manually create your secrets via `kubectl`
+_In order to use this type of secret you have to install `Kubernetes Secrets` [Helm Chart](https://github.com/drone/charts/tree/master/charts/drone-kubernetes-secrets).
+Furthermore the assumption is that you use `Kubernetes Runner` with out-of-cluster scope. 
+That is a scenario where your CI/CD exists in cluster **a** and you apply configurations in cluster **b**._
+
+_For in-cluster usage you do not need `Kubernetes Secrets` or secrets at all. See <a href="#in-cluster-use">in-cluster use</a>._
+
+Before using Kubenrnetes Secrets in your pipeline you first need to manually create your secrets via `kubectl`
 
 ```
 $
 ```
 
-### Kubernetes Secret Pipe Example
+### Kubernetes Secret - Kubernetes Runner Pipe Example
 
 ```yaml
 kind: pipeline
-type: docker
+type: kubernetes
 name: dron8s-out-of-cluster-example
 
 steps:
@@ -110,13 +116,28 @@ get:
 
 
 **3. Encrypted (Drone)**
-### Encrypted Secret Pipe Example
+
+In order to use this method you need to have Drone CLI [installed](https://docs.drone.io/cli/install/) and [configured](https://docs.drone.io/cli/configure/) on your machine.
+
+To generate the secret run:
+```
+drone encrypt user/repositry $(printf “%s” “$(<~/.kube/config)”)
+```
+where `user` is your real username and `repository` the name of the repository that you are creating the secret for.
+
+Copy the output out your terminal to `data` field inside kubeconfig secret.
+
+### Encrypted Secret - Exec Runner Pipe Example
 
 ```yaml
 kind: pipeline
-type: docker
+type: exec
 name: dron8s-out-of-cluster-example
 
+platform:
+  os: linux
+  arch: amd64
+  
 steps:
 - name: dron8s
   image: bh90210/dron8s:latest
@@ -127,13 +148,13 @@ steps:
 ---
 kind: secret
 name: kubeconfig
-data: ZXVDFHSfiy5vzdvvZWRSEdIRlloamRmaW9saGJkc0vsVSDVsvsd97vsdvkpgu8n9yecrHFRDSeiorncsafASEVTBkyNjM0OTUxOTA1NDQ1NTQ2
+data: ZGDJTGfiy5vzdvvZWRSEdIRlloamRmaW9saGJkc0vsVSDVs[...]
 ```
 
 
 # Developing
 
-You need to have [Go](https://golang.org/doc/install) and Docker installed on your system.
+You need to have [Go](https://golang.org/doc/install) and [Docker](https://docs.docker.com/get-docker/) installed on your system.
 
 If you wish you may clone the repo and directly edit `.drone.yaml` as everything you need for the build is right there.
 
@@ -159,5 +180,10 @@ steps:
 ```
 _Replace `{yourusername}` with your actual Docker Hub (or other registry) username._
 
-_For more information see Drone's [Plugin Documentation](https://docs.drone.io/plugins/tutorials/golang/)._
+_For more information see Drone's [Go Plugin Documentation](https://docs.drone.io/plugins/tutorials/golang/)._
 
+# Contributing 
+
+Any code improvements, updates, documentation spelling mistakes corrections etc are _always_ very welcome.
+
+It is a very simple project so just clone the master branch, edit it and open a PR.
