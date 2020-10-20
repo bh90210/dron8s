@@ -55,13 +55,13 @@ Create a secret with the contents of kubeconfig.
 
 _NOTE: You can always use Vault or AWS Secrets etc. But for this example I only show [Per Repository](https://docs.drone.io/secret/repository/), [Kubernetes Secrets](https://docs.drone.io/secret/external/kubernetes/) & [Encrypted](https://docs.drone.io/secret/encrypted/)._
 
-**1. Per Repository - Docker Runner (GUI)**
+**1. Per Repository Secrets (GUI)**
 
 Copy the contents of your `~/.kube/config` in Drone's Secret Value field:
 
 ![Imgur](https://imgur.com/Cx9h3Xx.jpg)
 
-### Per Repository Secret Pipe Example
+### Per Repository Secret - Docker Runner Pipe Example
 
 ```yaml
 kind: pipeline
@@ -92,7 +92,7 @@ Before using Kubenrnetes Secrets in your pipeline you first need to manually cre
 $
 ```
 
-### Kubernetes Secret - Kubernetes Runner Pipe Example
+### Kubernetes Secrets - Kubernetes Runner Pipe Example
 
 ```yaml
 kind: pipeline
