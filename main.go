@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -29,10 +30,10 @@ import (
 
 func main() {
 	var config *rest.Config
-
+	// Lookup for env variable `PLUGIN_KUBECONFIG`.
 	kubeconfig, exists := os.LookupEnv("PLUGIN_KUBECONFIG")
-
 	switch exists {
+	// If it does exists means user intents for out-of-cluster usage with provided kubeconfig
 	case true:
 		outOfCluster, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
 		if err != nil {
@@ -40,8 +41,8 @@ func main() {
 		}
 		config = outOfCluster
 
+	// If user didn't provide a kubeconfig dron8s defaults to create an in-cluster config
 	case false:
-		// create the in-cluster config
 		inCluster, err := rest.InClusterConfig()
 		if err != nil {
 			panic(err.Error())
@@ -49,6 +50,7 @@ func main() {
 		config = inCluster
 	}
 
+	// run the server side apply function
 	err := ssa(context.Background(), config)
 	log.Println(err)
 }
@@ -80,13 +82,18 @@ func ssa(ctx context.Context, cfg *rest.Config) error {
 	text := string(yaml)
 	// Parse each yaml from file
 	configs := strings.Split(text, "---")
+	// variable to hold and print how many yaml configs are present
+	var sum int
 	// Iterate over provided configs
-	for _, v := range configs {
+	for i, v := range configs {
 		// If a yaml starts with `---`
 		// the first slice of `configs` will be empty
+		// so we just skip (continue) to next iteration
 		if len(v) == 0 {
 			continue
 		}
+
+		fmt.Println("Applying yaml nu ", i)
 
 		// 3. Decode YAML manifest into unstructured.Unstructured
 		obj := &unstructured.Unstructured{}
@@ -123,7 +130,11 @@ func ssa(ctx context.Context, cfg *rest.Config) error {
 		_, err = dr.Patch(ctx, obj.GetName(), types.ApplyPatchType, data, metav1.PatchOptions{
 			FieldManager: "dron8s-plugin",
 		})
+
+		sum = i
 	}
+
+	fmt.Println("Dron8s finished applying ", sum+1, " resources.")
 
 	return err
 }

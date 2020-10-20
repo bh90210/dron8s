@@ -9,7 +9,7 @@ Yet another Kubernetes plugin for Drone using [dynamic](https://pkg.go.dev/k8s.i
 * In-cluster/Out-of-cluster use
 * Easy set up, simple usage
 
-_<sup>1</sup>Using client-go@v0.19.2. While common Kubernetes API will work with your cluster, some features will not. For more information check the [compatibility matrix](https://github.com/kubernetes/client-go#compatibility-matrix)._
+_<sup>1</sup>Dron8s uses [client-go@v0.19.2](https://github.com/kubernetes/client-go/tree/v0.19.2). While most common Kubernetes API will work with your cluster's version, some features will not. For more information check the [compatibility matrix](https://github.com/kubernetes/client-go#compatibility-matrix)._
 
 # [in-cluster](https://github.com/kubernetes/client-go/tree/master/examples/in-cluster-client-configuration) use
 
@@ -25,7 +25,7 @@ $ kubectl create clusterrolebinding dron8s --clusterrole=cluster-admin --service
 _If you opted for manual installation you have to replace the `--serviceaccount` flag with the correct service name you used (ie. `--serviceaccount=drone-ci:default`)._
 
 
-## Example 
+### In-cluster Pipe Example 
 ```yaml
 kind: pipeline
 type: kubernetes
@@ -38,18 +38,31 @@ steps:
     yaml: ./config.yaml
 ```
 
+## Uninstall
+
+You need to manually delete the `clusterrolebinding` created as prerequisite. Run:
+
+```bash
+$ kubectl delete clusterrolebinding dron8s
+```
+
 # [out-of-cluster](https://github.com/kubernetes/client-go/tree/master/examples/out-of-cluster-client-configuration) use
 
 For out-of-cluster use you can choose whichever [runner](https://docs.drone.io/runner/overview/) you prefer but you need to provide you cluster's `kubeconfig` via a secret.
 
 ## Prerequisites 
-Create a secret with the contents of kubeconfig
+Create a secret with the contents of kubeconfig.
 
-1. gui
-2. kubenrnetes secrets
-3. encrypted
+_NOTE: You can always use Vault or AWS Secrets etc. But for this example I only show [Per Repository](https://docs.drone.io/secret/repository/), [Kubernetes Secrets](https://docs.drone.io/secret/external/kubernetes/) & [Encrypted](https://docs.drone.io/secret/encrypted/)._
 
-## Example 
+**1. Per Repository (GUI)**
+
+Copy the contents of your `~/.kube/config` in Drone's Secret Value field:
+
+![Imgur](https://imgur.com/Cx9h3Xx.jpg)
+
+### Per Repository Secret Pipe Example
+
 ```yaml
 kind: pipeline
 type: docker
@@ -61,31 +74,78 @@ steps:
   settings:
     yaml: ./config.yaml
     kubeconfig:
-        from_secret:
-            secret
+        from_secret: kubeconfig
 ```
 
-# In-cluster Uninstall
 
-You need to manually delete the `clusterrolebinding` created as prerequisite. Run:
+**2. Kubenrnetes Secrets (Kubectl)**
 
-```bash
-$ kubectl delete clusterrolebinding dron8s
+Before using this type of secret you first need to manually create your secrets via `kubectl`
+
 ```
+$
+```
+
+### Kubernetes Secret Pipe Example
+
+```yaml
+kind: pipeline
+type: docker
+name: dron8s-out-of-cluster-example
+
+steps:
+- name: dron8s
+  image: bh90210/dron8s:latest
+  settings:
+    yaml: ./config.yaml
+    kubeconfig:
+        from_secret: kubeconfig
+---
+kind: secret
+name: kubeconfig
+get:
+  path: kubernetes
+  name: kubeconfig
+```
+
+
+**3. Encrypted (Drone)**
+### Encrypted Secret Pipe Example
+
+```yaml
+kind: pipeline
+type: docker
+name: dron8s-out-of-cluster-example
+
+steps:
+- name: dron8s
+  image: bh90210/dron8s:latest
+  settings:
+    yaml: ./config.yaml
+    kubeconfig:
+        from_secret: kubeconfig
+---
+kind: secret
+name: kubeconfig
+data: ZXVDFHSfiy5vzdvvZWRSEdIRlloamRmaW9saGJkc0vsVSDVsvsd97vsdvkpgu8n9yecrHFRDSeiorncsafASEVTBkyNjM0OTUxOTA1NDQ1NTQ2
+```
+
 
 # Developing
 
-If you wish you can clone and directly edit `.drone.yaml` as everything you need for the build is right there.
+You need to have [Go](https://golang.org/doc/install) and Docker installed on your system.
+
+If you wish you may clone the repo and directly edit `.drone.yaml` as everything you need for the build is right there.
 
 Otherwise:
 
 ```bash
 $ git clone github.com/bh90210/dron8s
 $ GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o dron8s
-$ docker build -t {username}/dron8s .
-$ docker push {username}/dron8s
+$ docker build -t {yourusername}/dron8s .
+$ docker push {yourusername}/dron8s
 ```
-And to use your own repo inside Drone just change the `image` field to your `{username}/dron8s`
+To use your own repo inside Drone pipelines just change the `image` field to `{yourusername}/dron8s`
 ```yaml
 kind: pipeline
 type: docker
@@ -93,11 +153,11 @@ name: default
 
 steps:
 - name: dron8s
-  image: {username}/dron8s
+  image: {yourusername}/dron8s
   settings:
     yaml: ./config
 ```
-_Replace `{username}` with your actual Docker Hub (or other registry) username._
+_Replace `{yourusername}` with your actual Docker Hub (or other registry) username._
 
 _For more information see Drone's [Plugin Documentation](https://docs.drone.io/plugins/tutorials/golang/)._
 
