@@ -88,7 +88,7 @@ _For in-cluster usage you do not need `Kubernetes Secrets` or secrets at all. Se
 
 Before using Kubenrnetes Secrets in your pipeline you first need to manually create your secrets via `kubectl`
 
-```
+```bash
 $
 ```
 
@@ -120,8 +120,8 @@ get:
 In order to use this method you need to have Drone CLI [installed](https://docs.drone.io/cli/install/) and [configured](https://docs.drone.io/cli/configure/) on your machine.
 
 To generate the secret run:
-```
-drone encrypt user/repositry $(printf “%s” “$(<~/.kube/config)”)
+```bash
+$ drone encrypt user/repositry $(printf “%s” “$(<~/.kube/config)”)
 ```
 where `user` is your real username and `repository` the name of the repository that you are creating the secret for.
 
@@ -137,7 +137,7 @@ name: dron8s-out-of-cluster-example
 platform:
   os: linux
   arch: amd64
-  
+
 steps:
 - name: dron8s
   image: bh90210/dron8s:latest
@@ -184,6 +184,6 @@ _For more information see Drone's [Go Plugin Documentation](https://docs.drone.i
 
 # Contributing 
 
-Any code improvements, updates, documentation spelling mistakes corrections etc are _always_ very welcome.
+Any code improvements, updates, documentation spelling corrections etc are _always_ very welcome.
 
 It is a very simple project so just clone the master branch, edit it and open a PR.
