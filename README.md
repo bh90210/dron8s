@@ -13,7 +13,7 @@ _<sup>1</sup>Dron8s uses [client-go@v0.19.2](https://github.com/kubernetes/clien
 
 # [in-cluster](https://github.com/kubernetes/client-go/tree/master/examples/in-cluster-client-configuration) use
 
-In-cluster use is intented to only work along [Kubernetes Runner](https://docs.drone.io/runner/kubernetes/overview/) with in-cluster deployment scope. That is your pipelines can only create/patch resources within the cluster Kubernetes Runner is running.
+In-cluster use is intented to only work along [Kubernetes Runner](https://docs.drone.io/runner/kubernetes/overview/) with in-cluster deployment scope. That is your pipelines can only `apply` resources within the cluster Kubernetes Runner is running.
 
 ## Prerequisites 
 You need to manually create a `clusterrolebinding` to allow cluster resource manipulation from Drone server.
@@ -61,7 +61,7 @@ Copy the contents of your `~/.kube/config` in Drone's Secret Value field:
 
 ![Imgur](https://imgur.com/Cx9h3Xx.jpg)
 
-### Per Repository Secret - Docker Runner Pipe Example
+### Per Repository Secrets - Docker Runner Pipe Example
 
 ```yaml
 kind: pipeline
@@ -76,15 +76,17 @@ steps:
     kubeconfig:
         from_secret: kubeconfig
 ```
+## Uninstall
 
+Delete the `secret` containing kubeconfig.
+
+![Imgur](https://imgur.com/nyxIlxY.jpg)
 
 **2. Kubenrnetes Secrets (Kubectl)**
 
 _In order to use this type of secret you have to install `Kubernetes Secrets` [Helm Chart](https://github.com/drone/charts/tree/master/charts/drone-kubernetes-secrets).
 Furthermore the assumption is that you use `Kubernetes Runner` with out-of-cluster scope. 
-That is a scenario where your CI/CD exists in cluster **a** and you apply configurations in cluster **b**._
-
-_For in-cluster usage you do not need `Kubernetes Secrets` or secrets at all. See <a href="#in-cluster-use">in-cluster use</a>._
+That is a scenario where your CI/CD exists in cluster **a** and you apply configurations in cluster **b**. For in-cluster usage you do not need `Kubernetes Secrets` or secrets at all. See <a href="#in-cluster-use">in-cluster use</a>._
 
 Before using Kubenrnetes Secrets in your pipeline you first need to manually create your secrets via `kubectl`
 
@@ -114,6 +116,13 @@ get:
   name: kubeconfig
 ```
 
+## Uninstall
+
+Delete the `secret` containing kubeconfig. Run:
+
+```bash
+$ kubectl delete secret dron8s-kubeconfig
+```
 
 **3. Encrypted (Drone)**
 
