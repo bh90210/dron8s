@@ -37,22 +37,28 @@ func main() {
 	case true:
 		outOfCluster, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
 		if err != nil {
-			panic(err.Error())
+			fmt.Println(err)
+			os.Exit(1)
 		}
 		config = outOfCluster
+		fmt.Println("Out-of-cluster SSA initiliazing")
 
 	// If user didn't provide a kubeconfig dron8s defaults to create an in-cluster config
 	case false:
 		inCluster, err := rest.InClusterConfig()
 		if err != nil {
-			panic(err.Error())
+			fmt.Println(err)
+			os.Exit(1)
 		}
 		config = inCluster
+		fmt.Println("In-cluster SSA initiliazing")
 	}
 
 	// run the server side apply function
 	err := ssa(context.Background(), config)
-	log.Println(err)
+	if err != nil {
+		fmt.Println(err)
+	}
 }
 
 // https://ymmt2005.hatenablog.com/entry/2020/04/14/An_example_of_using_dynamic_client_of_k8s.io/client-go#Go-client-libraries
@@ -93,7 +99,7 @@ func ssa(ctx context.Context, cfg *rest.Config) error {
 			continue
 		}
 
-		fmt.Println("Applying yaml nu ", i)
+		fmt.Println("Applying config #", i)
 
 		// 3. Decode YAML manifest into unstructured.Unstructured
 		obj := &unstructured.Unstructured{}
@@ -134,7 +140,7 @@ func ssa(ctx context.Context, cfg *rest.Config) error {
 		sum = i
 	}
 
-	fmt.Println("Dron8s finished applying ", sum+1, " resources.")
+	fmt.Println("Dron8s finished applying ", sum+1, " configs.")
 
 	return err
 }

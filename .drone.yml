@@ -1,1 +1,3 @@
 # tag
+
+# kubectl create clusterrolebinding dron8s --clusterrole=edit --serviceaccount=drone:drone-runner-kube --namespace=drone
