@@ -31,7 +31,6 @@ kind: pipeline
 type: kubernetes
 name: dron8s-in-cluster-example
 
-
 steps:
 - name: dron8s
   image: bh90210/dron8s:latest
@@ -56,7 +55,6 @@ kind: pipeline
 type: docker
 name: dron8s-out-of-cluster-example
 
-
 steps:
 - name: dron8s
   image: bh90210/dron8s:latest
@@ -69,7 +67,7 @@ steps:
 
 # In-cluster Uninstall
 
-The only thing you need to manually delete is the `clusterrolebinding`. Run:
+You need to manually delete the `clusterrolebinding` created as prerequisite. Run:
 
 ```bash
 $ kubectl delete clusterrolebinding dron8s
@@ -77,17 +75,14 @@ $ kubectl delete clusterrolebinding dron8s
 
 # Developing
 
-If you wish you can directly edit `.drone.yaml` as everything you need for the build is right there.
+If you wish you can clone and directly edit `.drone.yaml` as everything you need for the build is right there.
 
 Otherwise:
 
 ```bash
 $ git clone github.com/bh90210/dron8s
-
 $ GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o dron8s
-
 $ docker build -t {username}/dron8s .
-
 $ docker push {username}/dron8s
 ```
 And to use your own repo inside Drone just change the `image` field to your `{username}/dron8s`
