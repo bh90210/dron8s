@@ -161,6 +161,19 @@ name: kubeconfig
 data: ZGDJTGfiy5vzdvvZWRSEdIRlloamRmaW9saGJkc0vsVSDVs[...]
 ```
 
+# Know issues (and workarounds)
+
+* If your resource contains `ports:` without specifically declaring `protocol: TCP`/`protocol: UDP` you will probably get a similar error:
+```log
+failed to create typed patch object: .spec.template.spec.containers[name=].ports: element 0: associative list with keys has an element that omits key field "protocol"
+```
+The workaround is to simply define a protocol like so: 
+```yaml
+        ports:
+          - protocol: TCP
+            containerPort: 80
+```
+
 
 # Developing
 
