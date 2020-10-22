@@ -6,7 +6,7 @@ steps:
 - name: out-of-cluster
   image: bh90210/dron8s:latest
   settings:
-    yaml: ./dgraph.yaml
+    yaml: ./HA-dgraph.yaml
     kubeconfig:
       from_secret: k8secret
 ---

@@ -167,7 +167,7 @@ data: ZGDJTGfiy5vzdvvZWRSEdIRlloamRmaW9saGJkc0vsVSDVs[...]
 ```log
 failed to create typed patch object: .spec.template.spec.containers[name=].ports: element 0: associative list with keys has an element that omits key field "protocol"
 ```
-The workaround is to simply define a protocol like so whenver possible: 
+The workaround is to simply define a protocol like so where applicable: 
 ```yaml
         ports:
           - protocol: TCP
