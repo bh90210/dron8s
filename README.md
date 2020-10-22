@@ -91,7 +91,7 @@ That is a scenario where your CI/CD exists in cluster **a** and you apply config
 Before using Kubernetes Secrets in your pipeline you first need to manually create your secrets via `kubectl`. In our case we need to create a secret out of `~/.kube/config`. Run:
 
 ```bash
-$ kubectl create secret generic dron8s --from-file=kubeconfig=$HOME/.kube/config --namespace=drone
+$ kubectl create secret generic dron8s --from-file=kubeconfig=$HOME/.kube/config
 ```
 
 ### Kubernetes Secrets - Kubernetes Runner Pipe Example
@@ -136,12 +136,16 @@ where `user` is your real username and `repository` the name of the repository t
 
 Copy the output of your terminal to `data` field inside kubeconfig secret.
 
-### Encrypted Secret - Docker Runner Pipe Example
+### Encrypted Secret - Exec Runner Pipe Example
 
 ```yaml
 kind: pipeline
-type: docker
+type: exec
 name: dron8s-out-of-cluster-example
+
+platform:
+  os: linux
+  arch: amd64
 
 steps:
 - name: dron8s

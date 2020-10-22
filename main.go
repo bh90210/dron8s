@@ -34,7 +34,15 @@ func main() {
 	switch exists {
 	// If it does exists means user intents for out-of-cluster usage with provided kubeconfig
 	case true:
-		outOfCluster, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
+		data := []byte(kubeconfig)
+		// create a kubeconfig file
+		err := ioutil.WriteFile("./kubeconfig", data, 0644)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
+		outOfCluster, err := clientcmd.BuildConfigFromFlags("", "./kubeconfig")
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
@@ -98,8 +106,6 @@ func ssa(ctx context.Context, cfg *rest.Config) error {
 			continue
 		}
 
-		fmt.Println("Applying config #", i)
-
 		// 3. Decode YAML manifest into unstructured.Unstructured
 		obj := &unstructured.Unstructured{}
 		_, gvk, err := decUnstructured.Decode([]byte(v), nil, obj)
@@ -129,6 +135,7 @@ func ssa(ctx context.Context, cfg *rest.Config) error {
 			return err
 		}
 
+		fmt.Println("Applying config #", i)
 		// 7. Create or Update the object with SSA
 		//     types.ApplyPatchType indicates SSA.
 		//     FieldManager specifies the field owner ID.
