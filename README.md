@@ -53,7 +53,7 @@ For out-of-cluster use you can choose whichever [runner](https://docs.drone.io/r
 ## Prerequisites 
 Create a secret with the contents of kubeconfig.
 
-_NOTE: You can always use Vault or AWS Secrets etc. But for this example I only show Per [Repository](https://docs.drone.io/secret/repository/),  [Kubernetes Secrets](https://docs.drone.io/secret/external/kubernetes/) & [Encrypted](https://docs.drone.io/secret/encrypted/)._
+_NOTE: You can always use Vault or AWS Secrets etc. But for this example I only show [Per Repository](https://docs.drone.io/secret/repository/),  [Kubernetes Secrets](https://docs.drone.io/secret/external/kubernetes/) & [Encrypted](https://docs.drone.io/secret/encrypted/)._
 
 ## **1. Per Repository Secrets (GUI)**
 
