@@ -1,4 +1,7 @@
 # Dron8s
+<img src=https://goreportcard.com/badge/github.com/bh90210/dron8s />
+<a href="https://pkg.go.dev/github.com/bh90210/dron8s"><img src="https://pkg.go.dev/badge/github.com/bh90210/dron8s" alt="PkgGoDev"></a>
+<img src=https://drone.euoe.dev/api/badges/bh90210/dron8s/status.svg />
 
 Yet another Kubernetes plugin for Drone using [dynamic](https://pkg.go.dev/k8s.io/client-go@v0.19.2/dynamic) [Server Side Apply](https://kubernetes.io/docs/reference/using-api/api-concepts/#server-side-apply) to achieve `kubectl apply -f` parity for your CI-CD pipelines.
 
