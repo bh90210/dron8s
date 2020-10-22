@@ -1,0 +1,19 @@
+kind: pipeline
+type: kubernetes
+name: dron8s-example
+
+steps:
+- name: in-cluster
+  image: bh90210/dron8s:v0.1.2
+  settings:
+    yaml: ./dgraph.yaml
+    kubeconfig:
+      from_secret: k8secret
+---
+# don't gorfet to create the secret first
+# kubectl create secret generic dron8s --from-file=kubeconfig=$HOME/.kube/config
+kind: secret
+name: k8secret
+get:
+  path: dron8s
+  name: kubeconfig
