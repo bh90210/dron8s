@@ -110,13 +110,13 @@ func ssa(ctx context.Context, cfg *rest.Config) error {
 		obj := &unstructured.Unstructured{}
 		_, gvk, err := decUnstructured.Decode([]byte(v), nil, obj)
 		if err != nil {
-			return err
+			fmt.Println(err)
 		}
 
 		// 4. Find GVR
 		mapping, err := mapper.RESTMapping(gvk.GroupKind(), gvk.Version)
 		if err != nil {
-			return err
+			fmt.Println(err)
 		}
 
 		// 5. Obtain REST interface for the GVR
@@ -132,7 +132,7 @@ func ssa(ctx context.Context, cfg *rest.Config) error {
 		// 6. Marshal object into JSON
 		data, err := json.Marshal(obj)
 		if err != nil {
-			return err
+			fmt.Println(err)
 		}
 
 		fmt.Println("Applying config #", i)
@@ -143,7 +143,7 @@ func ssa(ctx context.Context, cfg *rest.Config) error {
 			FieldManager: "dron8s-plugin",
 		})
 		if err != nil {
-			return err
+			fmt.Println(err)
 		}
 
 		sum = i
@@ -151,5 +151,5 @@ func ssa(ctx context.Context, cfg *rest.Config) error {
 
 	fmt.Println("Dron8s finished applying ", sum+1, " configs.")
 
-	return err
+	return nil
 }
