@@ -88,12 +88,12 @@ _In order to use this type of secret you have to install `Kubernetes Secrets` [H
 Furthermore the assumption is that you use `Kubernetes Runner` with out-of-cluster scope. 
 That is a scenario where your CI/CD exists in cluster **a** and you apply configurations in cluster **b**. For in-cluster usage you do not need `Kubernetes Secrets` or secrets at all. See <a href="#in-cluster-use">in-cluster use</a>._
 
-Before using Kubernetes Secrets in your pipeline you first need to manually create your secrets via `kubectl`. In our case we need to create a secret out of `~/.kube/config`. Run:
+Before using Kubernetes Secrets in your pipeline you first need to manually create your secrets via `kubectl`. In this case you need to create a secret out of `~/.kube/config`. Run:
 
 ```bash
 $ kubectl create secret generic dron8s --from-file=kubeconfig=$HOME/.kube/config
 ```
-
+_note that if you opted for different namespace than the default when installed `drone-kubernetes-secret` chart (`secretNamespace` & `KUBERNETES_NAMESPACE`) you need to also pass the appropriate `--namespace` flag to the above command_
 ### Kubernetes Secrets - Kubernetes Runner Pipe Example
 
 ```yaml
