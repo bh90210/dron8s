@@ -23,6 +23,8 @@ steps:
       from_secret: drone-docker-username
     password: 
       from_secret: drone-docker-password
+  environment:
+    HOME: "/tmp"
 
 trigger:
   event:
