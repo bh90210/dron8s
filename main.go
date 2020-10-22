@@ -21,12 +21,6 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 )
 
-// GOOS=linux GOARCH=amd64 CGO_ENABLED=0 ARG=v0.0.9 go generate main.go
-//go:generate go build -o dron8s
-//go:generate docker build -t bh90210/dron8s:latest -t bh90210/dron8s:$ARG .
-//go:generate docker push bh90210/dron8s:$ARG
-//go:generate docker push bh90210/dron8s:latest
-
 func main() {
 	var config *rest.Config
 	// Lookup for env variable `PLUGIN_KUBECONFIG`.

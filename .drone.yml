@@ -1,0 +1,43 @@
+kind: pipeline
+type: kubernetes
+name: dron8s-release
+
+steps:
+- name: Go Build
+  image: golang:1.15.2
+  environment:
+    GOOS: linux 
+    GOARCH: amd64 
+    CGO_ENABLED: "0"
+  commands:
+  - go build -o dron8s .
+
+- name: docker  
+  image: plugins/docker
+  settings:
+    repo: bh90210/dron8s
+    tags:
+      - latest
+    auto_tag: true
+    username: 
+      from_secret: username
+    password: 
+      from_secret: password
+
+trigger:
+  event:
+  - tag
+
+---
+kind: secret
+name: username
+get:
+  path: drone-docker
+  name: username
+
+---
+kind: secret
+name: password
+get:
+  path: drone-docker
+  name: password
