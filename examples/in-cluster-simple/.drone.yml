@@ -4,6 +4,6 @@ name: dron8s-example
 
 steps:
 - name: in-cluster
-  image: bh90210/dron8s:v0.1.2
+  image: bh90210/dron8s:latest
   settings:
     yaml: ./hello-kubernetes.yaml
