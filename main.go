@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 	"strings"
 
@@ -81,7 +80,7 @@ func ssa(ctx context.Context, cfg *rest.Config) error {
 	// 2.1. Read user's yaml
 	yaml, err := ioutil.ReadFile(os.Getenv("PLUGIN_YAML"))
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	// convert it to string
@@ -136,6 +135,9 @@ func ssa(ctx context.Context, cfg *rest.Config) error {
 		_, err = dr.Patch(ctx, obj.GetName(), types.ApplyPatchType, data, metav1.PatchOptions{
 			FieldManager: "dron8s-plugin",
 		})
+		if err != nil {
+			return err
+		}
 
 		sum = i
 	}

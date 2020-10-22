@@ -55,7 +55,7 @@ Create a secret with the contents of kubeconfig.
 
 _NOTE: You can always use Vault or AWS Secrets etc. But for this example I only show [Kubernetes Secrets](https://docs.drone.io/secret/external/kubernetes/) & [Encrypted](https://docs.drone.io/secret/encrypted/)._
 
-<!-- ## **1. Per Repository Secrets (GUI)**
+## **1. Per Repository Secrets (GUI)**
 
 Copy the contents of your `~/.kube/config` in Drone's Secret Value field and name the secret `kubeconfig`:
 
@@ -80,9 +80,9 @@ steps:
 
 Delete the `secret` containing kubeconfig.
 
-![Imgur](https://imgur.com/nyxIlxY.jpg) -->
+![Imgur](https://imgur.com/nyxIlxY.jpg)
 
-## **1. Kubernetes Secrets (Kubectl)**
+## **2. Kubernetes Secrets (Kubectl)**
 
 _In order to use this type of secret you have to install `Kubernetes Secrets` [Helm Chart](https://github.com/drone/charts/tree/master/charts/drone-kubernetes-secrets).
 Furthermore the assumption is that you use `Kubernetes Runner` with out-of-cluster scope. 
@@ -121,10 +121,10 @@ get:
 Delete the `secret` containing kubeconfig. Run:
 
 ```bash
-$ kubectl delete secret dron8s-kubeconfig
+$ kubectl delete secret dron8s-kubeconfig --namespace=drone
 ```
 
-## **2. Encrypted (Drone)**
+## **3. Encrypted (Drone CLI)**
 
 In order to use this method you need to have Drone CLI [installed](https://docs.drone.io/cli/install/) and [configured](https://docs.drone.io/cli/configure/) on your machine.
 
