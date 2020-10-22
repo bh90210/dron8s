@@ -163,16 +163,17 @@ data: ZGDJTGfiy5vzdvvZWRSEdIRlloamRmaW9saGJkc0vsVSDVs[...]
 
 # Know issues (and workarounds)
 
-* If your resource contains `ports:` without specifically declaring `protocol: TCP`/`protocol: UDP` you will probably get a similar error:
+* If your resource contains `ports:` without specifically declaring `protocol: TCP`/`protocol: UDP` [you will probably get](https://github.com/bh90210/dron8s/issues/5) a similar error:
 ```log
 failed to create typed patch object: .spec.template.spec.containers[name=].ports: element 0: associative list with keys has an element that omits key field "protocol"
 ```
-The workaround is to simply define a protocol like so: 
+The workaround is to simply define a protocol like so whenver possible: 
 ```yaml
         ports:
           - protocol: TCP
             containerPort: 80
 ```
+If it is not possible to alter the resource then maybe consider upgrading to Kubernetes v.0.20.0 where this bug is [hopefully resolved](https://github.com/kubernetes-sigs/structured-merge-diff/issues/130#issuecomment-706488157).
 
 
 # Developing
