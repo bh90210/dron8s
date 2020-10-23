@@ -122,7 +122,7 @@ get:
 Delete the `secret` containing kubeconfig. Run:
 
 ```bash
-$ kubectl delete secret dron8s-kubeconfig --namespace=drone
+$ kubectl delete secret dron8s-kubeconfig
 ```
 
 ## **3. Encrypted (Drone CLI)**
