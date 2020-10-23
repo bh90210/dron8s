@@ -3,7 +3,7 @@ type: kubernetes
 name: dron8s-release
 
 steps:
-- name: go build
+- name: go
   image: golang:1.15.2
   environment:
     GOOS: linux 
@@ -12,7 +12,7 @@ steps:
   commands:
   - go build -o dron8s .
 
-- name: docker image build & registry push
+- name: docker
   image: plugins/docker
   settings:
     repo: bh90210/dron8s
@@ -20,8 +20,8 @@ steps:
       - latest
     auto_tag: true
     username: bh90210
-    password: 
-      from_secret: password
+    password: f54bb51f-2975-466b-8647-641efc445b16
+      # from_secret: password
 
 trigger:
   event:
