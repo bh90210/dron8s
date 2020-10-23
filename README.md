@@ -200,7 +200,7 @@ steps:
 - name: dron8s
   image: {yourusername}/dron8s
   settings:
-    yaml: ./config
+    yaml: ./config.yaml
 ```
 _Replace `{yourusername}` with your actual Docker Hub (or other registry) username._
 
