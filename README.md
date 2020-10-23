@@ -161,7 +161,7 @@ name: kubeconfig
 data: ZGDJTGfiy5vzdvvZWRSEdIRlloamRmaW9saGJkc0vsVSDVs[...]
 ```
 
-# Know issues (and workarounds)
+# Known issues (and workarounds)
 
 * If your resource contains `ports:` without specifically declaring `protocol: TCP`/`protocol: UDP` [you will probably get](https://github.com/bh90210/dron8s/issues/5) a similar error:
 ```log

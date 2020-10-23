@@ -26,10 +26,6 @@ steps:
   environment:
     HOME: "/tmp"
 
-trigger:
-  event:
-  - tag
-
 ---
 kind: secret
 name: drone-docker-username
