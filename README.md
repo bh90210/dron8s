@@ -1,5 +1,5 @@
 # Dron8s
-<img src=https://drone.euoe.dev/api/badges/bh90210/dron8s/status.svg /> <img src=https://goreportcard.com/badge/github.com/bh90210/dron8s /> <img src=https://img.shields.io/docker/image-size/bh90210/dron8s /> <img src=https://img.shields.io/docker/pulls/bh90210/dron8s /> [![](https://images.microbadger.com/badges/image/bh90210/dron8s.svg)](https://microbadger.com/images/bh90210/dron8s "Get your own image badge on microbadger.com") 
+<img src=https://drone.euoe.dev/api/badges/bh90210/dron8s/status.svg /> <img src=https://goreportcard.com/badge/github.com/bh90210/dron8s /> <img src=https://img.shields.io/docker/image-size/bh90210/dron8s /> <img src=https://img.shields.io/docker/pulls/bh90210/dron8s /> 
 
 Yet another Kubernetes plugin for Drone using [dynamic](https://pkg.go.dev/k8s.io/client-go@v0.19.2/dynamic) [Server Side Apply](https://kubernetes.io/docs/reference/using-api/api-concepts/#server-side-apply) to achieve `kubectl apply -f` parity for your CI-CD pipelines.
 
