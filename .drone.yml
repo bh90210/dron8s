@@ -19,21 +19,17 @@ steps:
     tags:
       - latest
     auto_tag: true
-    username: 
-      from_secret: drone-docker-username
+    username: bh90210
     password: 
-      from_secret: drone-docker-password
+      from_secret: password
+
+trigger:
+  event:
+  - tag
 
 ---
 kind: secret
-name: drone-docker-username
-get:
-  path: drone-docker
-  name: username
-
----
-kind: secret
-name: drone-docker-password
+name: password
 get:
   path: drone-docker
   name: password
