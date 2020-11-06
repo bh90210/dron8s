@@ -122,7 +122,7 @@ get:
 Delete the `secret` containing kubeconfig. Run:
 
 ```bash
-$ kubectl delete secret dron8s-kubeconfig --namespace=drone
+$ kubectl delete secret dron8s
 ```
 
 ## **3. Encrypted (Drone CLI)**
@@ -175,6 +175,18 @@ The workaround is to simply define a protocol like so where applicable:
 ```
 If it is not possible to alter the resource then maybe consider upgrading to Kubernetes v.0.20.0 where this bug is [hopefully resolved](https://github.com/kubernetes-sigs/structured-merge-diff/issues/130#issuecomment-706488157).
 
+* If you get an error (we know this to be true for at least `configMap` resource - see [#11](/../../issues/11)) `the server could not find the requested resource`
+the solution is to include a `namespace` field in your config, which is recomended as best practice for k8s anyway.
+
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: demo
+  namespace: default
+data:
+  key: "value"
+```
 
 # Developing
 
