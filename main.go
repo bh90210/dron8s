@@ -59,6 +59,7 @@ func main() {
 	err := ssa(context.Background(), config)
 	if err != nil {
 		fmt.Println(err)
+		os.Exit(1)
 	}
 }
 
