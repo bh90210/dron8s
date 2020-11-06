@@ -22,7 +22,6 @@ import (
 )
 
 func main() {
-	var config *rest.Config
 	// Lookup for env variable `PLUGIN_KUBECONFIG`.
 	kubeconfig, exists := os.LookupEnv("PLUGIN_KUBECONFIG")
 	switch exists {
@@ -41,8 +40,13 @@ func main() {
 			fmt.Println(err)
 			os.Exit(1)
 		}
-		config = outOfCluster
+
 		fmt.Println("Out-of-cluster SSA initiliazing")
+		err = ssa(context.Background(), outOfCluster)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
 
 	// If user didn't provide a kubeconfig dron8s defaults to create an in-cluster config
 	case false:
@@ -51,16 +55,15 @@ func main() {
 			fmt.Println(err)
 			os.Exit(1)
 		}
-		config = inCluster
+
 		fmt.Println("In-cluster SSA initiliazing")
+		err = ssa(context.Background(), inCluster)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
 	}
 
-	// run the server side apply function
-	err := ssa(context.Background(), config)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
 }
 
 // https://ymmt2005.hatenablog.com/entry/2020/04/14/An_example_of_using_dynamic_client_of_k8s.io/client-go#Go-client-libraries
