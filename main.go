@@ -170,17 +170,18 @@ func ssa(ctx context.Context, cfg *rest.Config) error {
 func getVariablesFromDrone() map[string]string {
 	ctx := make(map[string]string)
 	pluginEnv := os.Environ()
+	pluginReg := regexp.MustCompile(`^PLUGIN_(.*)=(.*)`)
+	droneReg := regexp.MustCompile(`^DRONE_(.*)=(.*)`)
+
 	for _, value := range pluginEnv {
-		re := regexp.MustCompile(`^PLUGIN_(.*)=(.*)`)
-		if re.MatchString(value) {
-			matches := re.FindStringSubmatch(value)
+		if pluginReg.MatchString(value) {
+			matches := pluginReg.FindStringSubmatch(value)
 			key := strings.ToLower(matches[1])
 			ctx[key] = matches[2]
 		}
 
-		re = regexp.MustCompile(`^DRONE_(.*)=(.*)`)
-		if re.MatchString(value) {
-			matches := re.FindStringSubmatch(value)
+		if droneReg.MatchString(value) {
+			matches := droneReg.FindStringSubmatch(value)
 			key := strings.ToLower(matches[1])
 			ctx[key] = matches[2]
 		}
