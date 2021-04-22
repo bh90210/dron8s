@@ -1,0 +1,12 @@
+kind: pipeline
+type: kubernetes
+name: dron8s-example
+
+steps:
+- name: in-cluster
+  image: bh90210/dron8s:latest
+  settings:
+    yaml: ./hello-kubernetes.yaml
+    # variables. Must be lowercase, Usage: {{.service_name}}
+    service_name: myservice
+    image_version: 1.8
