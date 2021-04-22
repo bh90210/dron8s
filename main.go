@@ -96,7 +96,7 @@ func ssa(ctx context.Context, cfg *rest.Config) error {
 	text := string(yaml)
 	// Parse variables
 	t := template.Must(template.New("dron8s").Option("missingkey=zero").Parse(text))
-	b := bytes.NewBuffer(make([]byte, 0))
+	b := bytes.NewBuffer(make([]byte, 0, 512))
 	err = t.Execute(b, getVariablesFromDrone())
 	if err != nil {
 		return err
