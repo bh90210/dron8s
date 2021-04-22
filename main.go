@@ -97,7 +97,7 @@ func ssa(ctx context.Context, cfg *rest.Config) error {
 	// Parse variables
 	t := template.Must(template.New("dron8s").Option("missingkey=zero").Parse(text))
 	b := bytes.NewBuffer(make([]byte, 0))
-	err = t.Execute(b, getVariablesFormDrone())
+	err = t.Execute(b, getVariablesFromDrone())
 	if err != nil {
 		return err
 	}
@@ -166,8 +166,8 @@ func ssa(ctx context.Context, cfg *rest.Config) error {
 	return nil
 }
 
-// getVariablesFormDrone Get variables from drone
-func getVariablesFormDrone() map[string]string {
+// getVariablesFromDrone Get variables from drone
+func getVariablesFromDrone() map[string]string {
 	ctx := make(map[string]string)
 	pluginEnv := os.Environ()
 	for _, value := range pluginEnv {
