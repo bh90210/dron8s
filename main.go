@@ -118,6 +118,9 @@ func ssa(ctx context.Context, cfg *rest.Config) error {
 		// 3. Decode YAML manifest into unstructured.Unstructured
 		obj := &unstructured.Unstructured{}
 		_, gvk, err := decUnstructured.Decode([]byte(v), nil, obj)
+		if "" == obj.GetNamespace() {
+			obj.SetNamespace("default")
+		}
 		if err != nil {
 			return err
 		}
