@@ -71,5 +71,5 @@ get:
 
 # create the password:
 # echo -n "super-secure-password" > ./pass
-# kubectl create secret generic drone-docker --from-file=password=./pass
+# kubectl create secret generic drone-docker --from-file=password=./pass --namespace done
 # rm ./pass
