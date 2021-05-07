@@ -22,8 +22,6 @@ steps:
       from_secret: docker
 
 trigger:
-  branch:
-  - main
   event:
   - tag
   - push
@@ -43,34 +41,33 @@ steps:
   - go build -o dron8s .
 
 - name: docker
-  image: plugins/docker:linux-amd64
+  image: plugins/docker
   settings:
     registry: docker.pkg.github.com
-    repo: docker.pkg.github.com/bh90210/dron8s/dev
+    repo: bh90210/dron8s/dev
     tags:
       - latest
     username: bh90210
     password: 
-      from_secret: ghtoken
-    mtu: 1440
+      from_secret: github
 
 trigger:
   event:
   - pull_request
 ---
 kind: secret
-name: password
+name: docker
 get:
   path: drone-docker
   name: password
 ---
 kind: secret
-name: ghtoken
+name: github
 get:
   path: dron8s-github
-  name: ghtoken
+  name: password
 
 # create the password:
 # echo -n "super-secure-password" > ./pass
-# kubectl create secret generic drone-docker --from-file=password=./pass --namespace drone
+# kubectl create secret generic drone-docker --from-file=password=./pass
 # rm ./pass
