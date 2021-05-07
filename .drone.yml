@@ -46,7 +46,7 @@ steps:
   image: plugins/docker
   settings:
     registry: docker.pkg.github.com
-    repo: bh90210/dron8s
+    repo: docker.pkg.github.com/bh90210/dron8s
     tags:
       - latest
     username: bh90210
