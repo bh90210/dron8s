@@ -1,12 +1,15 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
+	"regexp"
 	"strings"
+	"text/template"
 
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -56,18 +59,6 @@ func main() {
 			os.Exit(1)
 		}
 
-		// clientset, err := kubernetes.NewForConfig(inCluster)
-		// if err != nil {
-		// 	fmt.Println(err)
-		// 	os.Exit(1)
-		// }
-
-		// secret, err := clientset.CoreV1().Secrets("").Get(context.TODO(), "test", v1.GetOptions{})
-		// if err != nil {
-		// 	fmt.Println(err)
-		// 	os.Exit(1)
-		// }
-
 		fmt.Println("In-cluster SSA initiliazing")
 		err = ssa(context.Background(), inCluster)
 		if err != nil {
@@ -103,6 +94,14 @@ func ssa(ctx context.Context, cfg *rest.Config) error {
 
 	// convert it to string
 	text := string(yaml)
+	// Parse variables
+	t := template.Must(template.New("dron8s").Option("missingkey=zero").Parse(text))
+	b := bytes.NewBuffer(make([]byte, 0, 512))
+	err = t.Execute(b, getVariablesFromDrone())
+	if err != nil {
+		return err
+	}
+	text = b.String()
 	// Parse each yaml from file
 	configs := strings.Split(text, "---")
 	// variable to hold and print how many yaml configs are present
@@ -132,6 +131,9 @@ func ssa(ctx context.Context, cfg *rest.Config) error {
 		// 5. Obtain REST interface for the GVR
 		var dr dynamic.ResourceInterface
 		if mapping.Scope.Name() == meta.RESTScopeNameNamespace {
+			if obj.GetNamespace() == "" {
+				obj.SetNamespace("default")
+			}
 			// namespaced resources should specify the namespace
 			dr = dyn.Resource(mapping.Resource).Namespace(obj.GetNamespace())
 		} else {
@@ -162,4 +164,27 @@ func ssa(ctx context.Context, cfg *rest.Config) error {
 	fmt.Println("Dron8s finished applying ", sum+1, " configs.")
 
 	return nil
+}
+
+// getVariablesFromDrone Get variables from drone
+func getVariablesFromDrone() map[string]string {
+	ctx := make(map[string]string)
+	pluginEnv := os.Environ()
+	pluginReg := regexp.MustCompile(`^PLUGIN_(.*)=(.*)`)
+	droneReg := regexp.MustCompile(`^DRONE_(.*)=(.*)`)
+
+	for _, value := range pluginEnv {
+		if pluginReg.MatchString(value) {
+			matches := pluginReg.FindStringSubmatch(value)
+			key := strings.ToLower(matches[1])
+			ctx[key] = matches[2]
+		}
+
+		if droneReg.MatchString(value) {
+			matches := droneReg.FindStringSubmatch(value)
+			key := strings.ToLower(matches[1])
+			ctx[key] = matches[2]
+		}
+	}
+	return ctx
 }
