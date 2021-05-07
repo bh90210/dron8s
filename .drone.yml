@@ -31,6 +31,8 @@ trigger:
 kind: pipeline
 type: kubernetes
 name: dron8s-pr
+platform:
+  os: linux
 
 steps:
 - name: go
