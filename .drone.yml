@@ -61,7 +61,7 @@ steps:
       - latest
     username: bh90210
     password: 
-      from_secret: docker
+      from_secret: github
 
 trigger:
   event:
