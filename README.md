@@ -221,9 +221,9 @@ _For more information see Drone's [Go Plugin Documentation](https://docs.drone.i
 ## CI
 
 On PRs a github package image is build.
-You can find it under [packages](https://github.com/bh90210/dron8s/packages/). 
+You can find it on [docker hub](https://hub.docker.com/repository/docker/bh90210/dron8s/general). 
 
-Use it with your pipelines: `docker.pkg.github.com/bh90210/dron8s/dev:latest`
+Use it with your pipelines: `bh90210/dron8s:dev`
 
 # Contributing 
 
