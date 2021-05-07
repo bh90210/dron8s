@@ -61,7 +61,7 @@ steps:
     username: bh90210
     password: 
       from_secret: password
-    debug: true
+    insecure: true
 
 trigger:
   event:
