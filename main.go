@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"regexp"
 	"strings"
@@ -101,7 +102,9 @@ func ssa(ctx context.Context, cfg *rest.Config) error {
 	if err != nil {
 		return err
 	}
-	text = b.String()
+	log.Println(text)
+	log.Fatal(b.String())
+	// text = b.String()
 	// Parse each yaml from file
 	configs := strings.Split(text, "---")
 	// variable to hold and print how many yaml configs are present
