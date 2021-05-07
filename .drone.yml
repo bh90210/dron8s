@@ -22,6 +22,8 @@ steps:
       from_secret: docker
 
 trigger:
+  branch:
+  - main
   event:
   - tag
   - push
