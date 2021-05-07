@@ -218,6 +218,13 @@ _Replace `{yourusername}` with your actual Docker Hub (or other registry) userna
 
 _For more information see Drone's [Go Plugin Documentation](https://docs.drone.io/plugins/tutorials/golang/)._
 
+## CI
+
+On PRs a github package image is build.
+You can find it under [packages](https://github.com/bh90210/dron8s/packages/). 
+
+Use it with your pipelines: `docker.pkg.github.com/bh90210/dron8s/dev:latest`
+
 # Contributing 
 
 Any code improvements, updates, documentation spelling corrections etc are _always_ very welcome.
