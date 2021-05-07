@@ -56,6 +56,18 @@ func main() {
 			os.Exit(1)
 		}
 
+		// clientset, err := kubernetes.NewForConfig(inCluster)
+		// if err != nil {
+		// 	fmt.Println(err)
+		// 	os.Exit(1)
+		// }
+
+		// secret, err := clientset.CoreV1().Secrets("").Get(context.TODO(), "test", v1.GetOptions{})
+		// if err != nil {
+		// 	fmt.Println(err)
+		// 	os.Exit(1)
+		// }
+
 		fmt.Println("In-cluster SSA initiliazing")
 		err = ssa(context.Background(), inCluster)
 		if err != nil {
