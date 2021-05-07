@@ -51,7 +51,7 @@ steps:
       - latest
     username: bh90210
     password: 
-      from_secret: github
+      from_secret: github-rs
 
 trigger:
   event:
