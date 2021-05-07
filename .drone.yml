@@ -31,8 +31,6 @@ trigger:
 kind: pipeline
 type: kubernetes
 name: dron8s-pr
-platform:
-  os: linux
 
 steps:
 - name: go
@@ -44,16 +42,25 @@ steps:
   commands:
   - go build -o dron8s .
 
+# - name: docker
+#   image: plugins/docker
+#   settings:
+#     registry: docker.pkg.github.com
+#     repo: docker.pkg.github.com/bh90210/dron8s
+#     tags:
+#       - latest
+#     username: bh90210
+#     password: 
+#       from_secret: ghtoken
 - name: docker
   image: plugins/docker
   settings:
-    registry: docker.pkg.github.com
-    repo: docker.pkg.github.com/bh90210/dron8s
+    repo: bh90210/dron8s
     tags:
       - latest
     username: bh90210
     password: 
-      from_secret: ghtoken
+      from_secret: password
 
 trigger:
   event:
