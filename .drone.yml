@@ -51,23 +51,23 @@ steps:
       - latest
     username: bh90210
     password: 
-      from_secret: github-rs
+      from_secret: ghtoken
 
 trigger:
   event:
   - pull_request
 ---
 kind: secret
-name: docker
+name: password
 get:
   path: drone-docker
   name: password
 ---
 kind: secret
-name: github-rs
+name: ghtoken
 get:
   path: dron8s-github
-  name: password
+  name: ghtoken
 
 # create the password:
 # echo -n "super-secure-password" > ./pass
