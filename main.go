@@ -113,6 +113,7 @@ func ssa(ctx context.Context, cfg *rest.Config) error {
 	if err != nil {
 		return err
 	}
+
 	text = b.String()
 	// Parse each yaml from file
 	configs := strings.Split(text, "---")
