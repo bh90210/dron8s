@@ -25,6 +25,7 @@ import (
 )
 
 func main() {
+	ctx := context.Background()
 	// Lookup for env variable `PLUGIN_KUBECONFIG`.
 	kubeconfig, exists := os.LookupEnv("PLUGIN_KUBECONFIG")
 	switch exists {
@@ -45,7 +46,7 @@ func main() {
 		}
 
 		fmt.Println("Out-of-cluster SSA initiliazing")
-		err = ssa(context.Background(), outOfCluster)
+		err = ssa(ctx, outOfCluster)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
@@ -72,7 +73,7 @@ func main() {
 		// }
 
 		fmt.Println("In-cluster SSA initiliazing")
-		err = ssa(context.Background(), inCluster)
+		err = ssa(ctx, inCluster)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
@@ -164,12 +165,19 @@ func ssa(ctx context.Context, cfg *rest.Config) error {
 		// 7. Create or Update the object with SSA
 		//     types.ApplyPatchType indicates SSA.
 		//     FieldManager specifies the field owner ID.
-		_, err = dr.Patch(ctx, obj.GetName(), types.ApplyPatchType, data, metav1.PatchOptions{
+		ret, err := dr.Patch(ctx, obj.GetName(), types.ApplyPatchType, data, metav1.PatchOptions{
 			FieldManager: "dron8s-plugin",
 		})
 		if err != nil {
 			return err
 		}
+
+		data, err = json.Marshal(ret)
+		if err != nil {
+			return err
+		}
+
+		fmt.Println(string(data))
 
 		sum = i
 	}

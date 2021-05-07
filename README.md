@@ -10,6 +10,7 @@ Yet another Kubernetes plugin for Drone using [dynamic](https://pkg.go.dev/k8s.i
 * In-cluster/Out-of-cluster use
 * Easy set up, simple usage, well documented
 * Support variables
+* Actively maintained 
 
 _<sup>1</sup>Dron8s uses [client-go@v0.19.2](https://github.com/kubernetes/client-go/tree/v0.19.2). While most common Kubernetes API will work with your cluster's version, some features will not. For more information check the [compatibility matrix](https://github.com/kubernetes/client-go#compatibility-matrix)._
 
