@@ -74,7 +74,7 @@ get:
   name: password
 ---
 kind: secret
-name: github
+name: github-rs
 get:
   path: dron8s-github
   name: password
