@@ -10,12 +10,14 @@ import (
 
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/serializer/yaml"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/discovery/cached/memory"
 	"k8s.io/client-go/dynamic"
+	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/restmapper"
 	"k8s.io/client-go/tools/clientcmd"
@@ -51,6 +53,18 @@ func main() {
 	// If user didn't provide a kubeconfig dron8s defaults to create an in-cluster config
 	case false:
 		inCluster, err := rest.InClusterConfig()
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
+		clientset, err := kubernetes.NewForConfig(inCluster)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
+		secret, err := clientset.CoreV1().Secrets("").Get(context.TODO(), "test", v1.GetOptions{})
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
