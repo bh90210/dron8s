@@ -60,7 +60,7 @@ trigger:
   - pull_request
 ---
 kind: secret
-name: password
+name: docker
 get:
   path: drone-docker
   name: password
