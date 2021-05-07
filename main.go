@@ -26,6 +26,7 @@ import (
 )
 
 func main() {
+	ctx := context.Background()
 	// Lookup for env variable `PLUGIN_KUBECONFIG`.
 	kubeconfig, exists := os.LookupEnv("PLUGIN_KUBECONFIG")
 	switch exists {
@@ -46,7 +47,7 @@ func main() {
 		}
 
 		fmt.Println("Out-of-cluster SSA initiliazing")
-		err = ssa(context.Background(), outOfCluster)
+		err = ssa(ctx, outOfCluster)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
@@ -61,7 +62,7 @@ func main() {
 		}
 
 		fmt.Println("In-cluster SSA initiliazing")
-		err = ssa(context.Background(), inCluster)
+		err = ssa(ctx, inCluster)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
@@ -97,14 +98,15 @@ func ssa(ctx context.Context, cfg *rest.Config) error {
 	text := string(yaml)
 	// Parse variables
 	t := template.Must(template.New("dron8s").Option("missingkey=zero").Parse(text))
-	b := bytes.NewBuffer(make([]byte, 0, 512))
+	b := &bytes.Buffer{}
 	err = t.Execute(b, getVariablesFromDrone())
 	if err != nil {
 		return err
 	}
-	log.Println(text)
+	// log.Println(text)
 	log.Println(b.String())
-	os.Exit(1)
+	text = b.String()
+	// os.Exit(1)
 	// text = b.String()
 	// Parse each yaml from file
 	configs := strings.Split(text, "---")
