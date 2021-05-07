@@ -52,7 +52,7 @@ steps:
       - latest
     username: bh90210
     password: 
-      from_secret: ghtoken
+      from_secret: github
     mtu: 1440
 
 trigger:
@@ -66,7 +66,7 @@ get:
   name: password
 ---
 kind: secret
-name: ghtoken
+name: github
 get:
   path: dron8s-github
   name: ghtoken
