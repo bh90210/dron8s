@@ -46,13 +46,12 @@ steps:
 - name: docker
   image: plugins/docker:linux-amd64
   settings:
-    registry: docker.pkg.github.com
-    repo: docker.pkg.github.com/bh90210/dron8s/dev
+    repo: bh90210/dron8s
     tags:
-      - latest
+      - dev
     username: bh90210
     password: 
-      from_secret: github
+      from_secret: docker
     mtu: 1440
 
 trigger:
@@ -64,12 +63,6 @@ name: docker
 get:
   path: drone-docker
   name: password
----
-kind: secret
-name: github
-get:
-  path: dron8s-github
-  name: ghtoken
 
 # create the password:
 # echo -n "super-secure-password" > ./pass
