@@ -42,16 +42,16 @@ steps:
   commands:
   - go build -o dron8s .
 
-# - name: docker
-#   image: plugins/docker
-#   settings:
-#     registry: docker.pkg.github.com
-#     repo: docker.pkg.github.com/bh90210/dron8s
-#     tags:
-#       - latest
-#     username: bh90210
-#     password: 
-#       from_secret: ghtoken
+- name: docker
+  image: plugins/docker
+  settings:
+    registry: docker.pkg.github.com
+    repo: docker.pkg.github.com/bh90210/dron8s/dev
+    tags:
+      - latest
+    username: bh90210
+    password: 
+      from_secret: ghtoken
 
 trigger:
   event:
