@@ -1,2 +1,4 @@
 *
-!dron8s
+!*.go
+!*.mod
+!*.sum
