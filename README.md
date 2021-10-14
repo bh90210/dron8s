@@ -173,6 +173,12 @@ name: kubeconfig
 data: ZGDJTGfiy5vzdvvZWRSEdIRlloamRmaW9saGJkc0vsVSDVs[...]
 ```
 
+# Field Manager
+
+[When transferring ownership for `server-side-apply`](https://kubernetes.io/docs/reference/using-api/server-side-apply/#transferring-ownership) you will need to know the field manager of Dron8s ([as described on the relevant issue](https://github.com/bh90210/dron8s/issues/24)).
+
+The field manager is `dron8s-plugin` and can be found in the [source code](https://github.com/bh90210/dron8s/blob/03fc616ea0bc8a612ee3ae1b95f9c4c2a385ffa2/main.go#L155) too.
+
 # Known issues (and workarounds)
 
 * If your resource contains `ports:` without specifically declaring `protocol: TCP`/`protocol: UDP` [you will probably get](https://github.com/bh90210/dron8s/issues/5) a similar error:
