@@ -6,7 +6,7 @@
 
 # Dron8s
 
-Yet another Kubernetes plugin for Drone using [dynamic](https://pkg.go.dev/k8s.io/client-go@v0.19.2/dynamic) [Server Side Apply](https://kubernetes.io/docs/reference/using-api/api-concepts/#server-side-apply) to achieve `kubectl apply -f` parity for your CI-CD pipelines.
+Yet another Kubernetes plugin for Drone using [dynamic](https://pkg.go.dev/k8s.io/client-go@v0.19.2/dynamic) [Server Side Apply](https://kubernetes.io/docs/reference/using-api/api-concepts/#server-side-apply) to achieve `kubectl apply --server-side` parity for your CI-CD pipelines.
 
 ## Features
 * Create resources if they do not exist/update if they do
@@ -33,6 +33,23 @@ _If you opted for manual installation you have to replace the `--serviceaccount`
 
 
 ### In-cluster Pipe Example 
+
+```yaml
+kind: pipeline
+type: kubernetes
+name: dron8s-in-cluster-example
+
+steps:
+- name: dron8s
+  image: bh90210/dron8s:latest
+  settings:
+    yaml: ./config.yaml
+```
+
+### In-cluster Pipe Example With Variables
+
+_for a full example see the [examples](https://github.com/bh90210/dron8s/tree/main/examples) folder_
+
 ```yaml
 kind: pipeline
 type: kubernetes
@@ -45,7 +62,15 @@ steps:
     yaml: ./config.yaml
     # variables. Must be lowercase, Usage: {{.service_name}}
     service_name: myservice
-    image_version: 1.8
+```
+And in your config:
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{.service_name}}
+spec:
+...
 ```
 
 ## Uninstall
@@ -85,9 +110,6 @@ steps:
     yaml: ./config.yaml
     kubeconfig:
         from_secret: kubeconfig
-    # variables. Must be lowercase, Usage: {{.service_name}}
-    service_name: myservice
-    image_version: 1.8
 ```
 ## Uninstall
 
@@ -173,6 +195,12 @@ name: kubeconfig
 data: ZGDJTGfiy5vzdvvZWRSEdIRlloamRmaW9saGJkc0vsVSDVs[...]
 ```
 
+# Field Manager
+
+[When transferring ownership for `server-side-apply`](https://kubernetes.io/docs/reference/using-api/server-side-apply/#transferring-ownership) you will need to know the field manager of Dron8s ([as described on the relevant issue](https://github.com/bh90210/dron8s/issues/24)).
+
+The field manager is `dron8s-plugin` and can be found in the [source code](https://github.com/bh90210/dron8s/blob/03fc616ea0bc8a612ee3ae1b95f9c4c2a385ffa2/main.go#L155) too.
+
 # Known issues (and workarounds)
 
 * If your resource contains `ports:` without specifically declaring `protocol: TCP`/`protocol: UDP` [you will probably get](https://github.com/bh90210/dron8s/issues/5) a similar error:
@@ -197,7 +225,6 @@ Otherwise:
 
 ```bash
 $ git clone github.com/bh90210/dron8s
-$ GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o dron8s
 $ docker build -t {yourusername}/dron8s .
 $ docker push {yourusername}/dron8s
 ```
@@ -216,13 +243,6 @@ steps:
 _Replace `{yourusername}` with your actual Docker Hub (or other registry) username._
 
 _For more information see Drone's [Go Plugin Documentation](https://docs.drone.io/plugins/tutorials/golang/)._
-
-### CI
-
-Upon opening a PR an image of the code is build.
-You can find it on [docker hub](https://hub.docker.com/repository/docker/bh90210/dron8s/general). 
-
-Use it with your pipelines: `bh90210/dron8s:dev`
 
 # Contributing 
 
