@@ -134,7 +134,6 @@ func ssa(ctx context.Context, cfg *rest.Config) error {
 			if obj.GetNamespace() == "" {
 				obj.SetNamespace("default")
 			}
-			// namespaced resources should specify the namespace
 			dr = dyn.Resource(mapping.Resource).Namespace(obj.GetNamespace())
 		} else {
 			// for cluster-wide resources
@@ -166,7 +165,6 @@ func ssa(ctx context.Context, cfg *rest.Config) error {
 	return nil
 }
 
-// getVariablesFromDrone Get variables from drone
 func getVariablesFromDrone() map[string]string {
 	ctx := make(map[string]string)
 	pluginEnv := os.Environ()

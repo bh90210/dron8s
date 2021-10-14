@@ -1,4 +1,3 @@
-FROM alpine:3.13.5
+FROM gcr.io/distroless/static
 ADD dron8s /bin/
-RUN apk -Uuv add ca-certificates
-ENTRYPOINT /bin/dron8s
+ENTRYPOINT ["dron8s"]
