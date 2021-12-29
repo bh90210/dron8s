@@ -102,8 +102,6 @@ func ssa(ctx context.Context, cfg *rest.Config) error {
 		return err
 	}
 	text = b.String()
-	fmt.Println(text)
-	
 	// Parse each yaml from file
 	configs := strings.Split(text, "---")
 	// variable to hold and print how many yaml configs are present
