@@ -95,13 +95,15 @@ func ssa(ctx context.Context, cfg *rest.Config) error {
 	// convert it to string
 	text := string(yaml)
 	// Parse variables
-	t := template.Must(template.New("dron8s").Option("missingkey=zero").Parse(text))
+	t := template.Must(template.New("dron8s").Option("missingkey=error").Parse(text))
 	b := bytes.NewBuffer(make([]byte, 0, 512))
 	err = t.Execute(b, getVariablesFromDrone())
 	if err != nil {
 		return err
 	}
 	text = b.String()
+	fmt.Println(text)
+	
 	// Parse each yaml from file
 	configs := strings.Split(text, "---")
 	// variable to hold and print how many yaml configs are present
