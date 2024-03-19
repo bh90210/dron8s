@@ -165,7 +165,8 @@ func applyYAML(configs []string, mapper *restmapper.DeferredDiscoveryRESTMapper,
 			}
 			raw, _ := m.AsYaml()
 			yamlString := strings.Split(string(raw), "---\n")
-			fmt.Printf("appying %d resources from kustomize", len(yamlString))
+			fmt.Printf("appying %d resources from kustomize\n", len(yamlString))
+			fmt.Println("=======================================================")
 			intSum, err := applyYAML(yamlString, mapper, dyn, ctx)
 			if nil != err {
 				fmt.Println("failed to apply following kustomize yaml")
@@ -173,6 +174,7 @@ func applyYAML(configs []string, mapper *restmapper.DeferredDiscoveryRESTMapper,
 				fmt.Println(err)
 				return sum, err
 			}
+			fmt.Println("=======================================================")
 			sum += intSum
 			continue
 		}
