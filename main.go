@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"regexp"
 	"strings"
@@ -32,7 +31,7 @@ func main() {
 	case true:
 		data := []byte(kubeconfig)
 		// create a kubeconfig file
-		err := ioutil.WriteFile("./kubeconfig", data, 0644)
+		err := os.WriteFile("./kubeconfig", data, 0644)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
@@ -71,8 +70,6 @@ func main() {
 
 // https://ymmt2005.hatenablog.com/entry/2020/04/14/An_example_of_using_dynamic_client_of_k8s.io/client-go#Go-client-libraries
 func ssa(ctx context.Context, cfg *rest.Config) error {
-	var decUnstructured = yaml.NewDecodingSerializer(unstructured.UnstructuredJSONScheme)
-
 	// 1. Prepare a RESTMapper to find GVR
 	dc, err := discovery.NewDiscoveryClientForConfig(cfg)
 	if err != nil {
@@ -87,7 +84,7 @@ func ssa(ctx context.Context, cfg *rest.Config) error {
 	}
 
 	// 2.1. Read user's yaml
-	yaml, err := ioutil.ReadFile(os.Getenv("PLUGIN_YAML"))
+	yaml, err := os.ReadFile(os.Getenv("PLUGIN_YAML"))
 	if err != nil {
 		return err
 	}
@@ -104,9 +101,23 @@ func ssa(ctx context.Context, cfg *rest.Config) error {
 	text = b.String()
 	// Parse each yaml from file
 	configs := strings.Split(text, "---")
+
+	// Iterate over provided configs
+
+	var sum int
+	sum, err = applyYAML(configs, mapper, dyn, ctx)
+
+	fmt.Println("Dron8s finished applying ", sum+1, " configs.")
+
+	return nil
+}
+
+func applyYAML(configs []string, mapper *restmapper.DeferredDiscoveryRESTMapper, dyn *dynamic.DynamicClient, ctx context.Context) (int, error) {
+	var decUnstructured = yaml.NewDecodingSerializer(unstructured.UnstructuredJSONScheme)
+
 	// variable to hold and print how many yaml configs are present
 	var sum int
-	// Iterate over provided configs
+
 	for i, v := range configs {
 		// If a yaml starts with `---`
 		// the first slice of `configs` will be empty
@@ -119,13 +130,15 @@ func ssa(ctx context.Context, cfg *rest.Config) error {
 		obj := &unstructured.Unstructured{}
 		_, gvk, err := decUnstructured.Decode([]byte(v), nil, obj)
 		if err != nil {
-			return err
+			return sum, err
 		}
+
+		print(gvk)
 
 		// 4. Find GVR
 		mapping, err := mapper.RESTMapping(gvk.GroupKind(), gvk.Version)
 		if err != nil {
-			return err
+			return sum, err
 		}
 
 		// 5. Obtain REST interface for the GVR
@@ -143,7 +156,7 @@ func ssa(ctx context.Context, cfg *rest.Config) error {
 		// 6. Marshal object into JSON
 		data, err := json.Marshal(obj)
 		if err != nil {
-			return err
+			return sum, err
 		}
 
 		fmt.Println("Applying config #", i)
@@ -154,15 +167,12 @@ func ssa(ctx context.Context, cfg *rest.Config) error {
 			FieldManager: "dron8s-plugin",
 		})
 		if err != nil {
-			return err
+			return sum, err
 		}
 
 		sum = i
 	}
-
-	fmt.Println("Dron8s finished applying ", sum+1, " configs.")
-
-	return nil
+	return sum, nil
 }
 
 func getVariablesFromDrone() map[string]string {
