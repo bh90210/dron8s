@@ -1,9 +1,0 @@
-kind: pipeline
-type: docker
-name: default
-
-steps:
-- name: dron8s
-  image: daniel98/dron8s:20240319
-  settings:
-    yaml: ./config.yaml
