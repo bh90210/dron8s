@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
 	"text/template"
@@ -21,6 +22,8 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/restmapper"
 	"k8s.io/client-go/tools/clientcmd"
+	"sigs.k8s.io/kustomize/api/krusty"
+	"sigs.k8s.io/kustomize/kyaml/filesys"
 )
 
 func main() {
@@ -89,27 +92,41 @@ func ssa(ctx context.Context, cfg *rest.Config) error {
 		return err
 	}
 
+	configs, err := parseYamlAndSplit(yaml)
+
+	if err != nil {
+		return err
+	}
+
+	// Iterate over provided configs
+	var sum int
+	sum, err = applyYAML(configs, mapper, dyn, ctx)
+
+	if nil != err {
+		fmt.Println("Failed to apply changes")
+		fmt.Println(err)
+		return err
+	}
+
+	fmt.Println("Dron8s finished applying ", sum, " configs.")
+
+	return nil
+}
+
+func parseYamlAndSplit(yaml []byte) ([]string, error) {
 	// convert it to string
 	text := string(yaml)
 	// Parse variables
 	t := template.Must(template.New("dron8s").Option("missingkey=error").Parse(text))
 	b := bytes.NewBuffer(make([]byte, 0, 512))
-	err = t.Execute(b, getVariablesFromDrone())
+	err := t.Execute(b, getVariablesFromDrone())
 	if err != nil {
-		return err
+		return nil, err
 	}
 	text = b.String()
 	// Parse each yaml from file
 	configs := strings.Split(text, "---")
-
-	// Iterate over provided configs
-
-	var sum int
-	sum, err = applyYAML(configs, mapper, dyn, ctx)
-
-	fmt.Println("Dron8s finished applying ", sum+1, " configs.")
-
-	return nil
+	return configs, nil
 }
 
 func applyYAML(configs []string, mapper *restmapper.DeferredDiscoveryRESTMapper, dyn *dynamic.DynamicClient, ctx context.Context) (int, error) {
@@ -117,8 +134,8 @@ func applyYAML(configs []string, mapper *restmapper.DeferredDiscoveryRESTMapper,
 
 	// variable to hold and print how many yaml configs are present
 	var sum int
-
 	for i, v := range configs {
+
 		// If a yaml starts with `---`
 		// the first slice of `configs` will be empty
 		// so we just skip (continue) to next iteration
@@ -133,7 +150,31 @@ func applyYAML(configs []string, mapper *restmapper.DeferredDiscoveryRESTMapper,
 			return sum, err
 		}
 
-		print(gvk)
+		if gvk.String() == "kustomize.config.k8s.io/v1beta1, Kind=Kustomization" {
+			fmt.Printf("detected kustomize file on index %d\n", i)
+			k := krusty.MakeKustomizer(krusty.MakeDefaultOptions())
+
+			filepath := filepath.Dir(os.Getenv("PLUGIN_YAML"))
+
+			fmt.Printf("run kustomize on %s\n", filepath)
+			m, err := k.Run(filesys.MakeFsOnDisk(), filepath)
+			if nil != err {
+				fmt.Println("failed to apply kustomize")
+				fmt.Println(err)
+				return sum, err
+			}
+			raw, _ := m.AsYaml()
+			yamlString := string(raw)
+			intSum, err := applyYAML([]string{yamlString}, mapper, dyn, ctx)
+			if nil != err {
+				fmt.Println("failed to apply following kustimze yaml")
+				fmt.Println(yamlString)
+				fmt.Println(err)
+				return sum, err
+			}
+			sum += intSum
+			continue
+		}
 
 		// 4. Find GVR
 		mapping, err := mapper.RESTMapping(gvk.GroupKind(), gvk.Version)
@@ -170,7 +211,7 @@ func applyYAML(configs []string, mapper *restmapper.DeferredDiscoveryRESTMapper,
 			return sum, err
 		}
 
-		sum = i
+		sum++
 	}
 	return sum, nil
 }
