@@ -5,6 +5,7 @@ go 1.19
 require (
 	k8s.io/apimachinery v0.29.3
 	k8s.io/client-go v0.29.3
+	sigs.k8s.io/kustomize/kyaml v0.16.0
 )
 
 require (
@@ -15,7 +16,6 @@ require (
 	github.com/xlab/treeprint v1.2.0 // indirect
 	go.starlark.net v0.0.0-20200306205701-8dd3e2ee1dd5 // indirect
 	gopkg.in/evanphx/json-patch.v5 v5.6.0 // indirect
-	sigs.k8s.io/kustomize/kyaml v0.16.0 // indirect
 )
 
 require (
