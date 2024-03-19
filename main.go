@@ -125,7 +125,7 @@ func parseYamlAndSplit(yaml []byte) ([]string, error) {
 	}
 	text = b.String()
 	// Parse each yaml from file
-	configs := strings.Split(text, "---")
+	configs := strings.Split(text, "---\n")
 	return configs, nil
 }
 
@@ -164,10 +164,11 @@ func applyYAML(configs []string, mapper *restmapper.DeferredDiscoveryRESTMapper,
 				return sum, err
 			}
 			raw, _ := m.AsYaml()
-			yamlString := string(raw)
-			intSum, err := applyYAML([]string{yamlString}, mapper, dyn, ctx)
+			yamlString := strings.Split(string(raw), "---\n")
+			fmt.Printf("appying %d resources from kustomize", len(yamlString))
+			intSum, err := applyYAML(yamlString, mapper, dyn, ctx)
 			if nil != err {
-				fmt.Println("failed to apply following kustimze yaml")
+				fmt.Println("failed to apply following kustomize yaml")
 				fmt.Println(yamlString)
 				fmt.Println(err)
 				return sum, err
