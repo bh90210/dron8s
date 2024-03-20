@@ -1,3 +1,5 @@
 dron8s
 pass
 .drone.yml
+test/
+deploy.sh
